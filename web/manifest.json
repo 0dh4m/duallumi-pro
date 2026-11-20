@@ -1,0 +1,30 @@
+{
+  "name": "DualLumi PRO - Smart Lighting Controller",
+  "short_name": "DualLumi PRO",
+  "description": "Unified Dual Lighting Controller for ELK-BLEDOB Strip and KS04-651420 Smart Bulb with Real-time Sync and Ambilight.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#070A10",
+  "theme_color": "#0E121B",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

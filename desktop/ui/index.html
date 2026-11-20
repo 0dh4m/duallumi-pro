@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DualLumi PRO Desktop - Smart Lighting Studio</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Ambient Dynamic Lighting Orbs -->
+  <div class="ambient-glow glow-1" id="glow-1"></div>
+  <div class="ambient-glow glow-2" id="glow-2"></div>
+
+  <div id="app">
+
+    <!-- ═══════════════════════════════════════════════════════════
+         FRAMELESS DESKTOP TITLEBAR
+    ═══════════════════════════════════════════════════════════════ -->
+    <header class="desktop-titlebar">
+      <div class="titlebar-brand">
+        <div class="brand-icon">⚡</div>
+        <span class="brand-name">DualLumi PRO</span>
+        <span class="badge-pro">v3.5 NATIVE</span>
+
+        <!-- Hardware Status Pills -->
+        <div class="status-pills">
+          <div class="pill-item">
+            <span class="dot" id="dot-bt"></span>
+            <span>Bluetooth</span>
+          </div>
+          <div class="pill-item">
+            <span class="dot" id="dot-strip"></span>
+            <span>Strip (ELK)</span>
+          </div>
+          <div class="pill-item">
+            <span class="dot" id="dot-bulb"></span>
+            <span>Bulb (KS04)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Window Actions -->
+      <div class="window-actions">
+        <button class="win-btn" id="win-mini" title="Toggle Mini Floating HUD (Ctrl+Shift+W)">🗗 Mini</button>
+        <button class="win-btn" id="win-min" title="Minimize">🗕</button>
+        <button class="win-btn" id="win-max" title="Maximize">🗖</button>
+        <button class="win-btn close" id="win-close" title="Minimize to Tray">✕</button>
+      </div>
+    </header>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         DASHBOARD GRID (Zero Web Scrollbars)
+    ═══════════════════════════════════════════════════════════════ -->
+    <main class="dashboard-grid">
+
+      <!-- LEFT COLUMN: ROOM VISUALIZER & HARDWARE CONTROLS -->
+      <section class="col-left">
+
+        <!-- Master Power & Mode Bar -->
+        <div class="master-bar">
+          <div class="mode-pills">
+            <button class="mode-btn active" id="btn-mode-sync">⚡ Sync Mode</button>
+            <button class="mode-btn" id="btn-mode-indep">🎛️ Independent</button>
+          </div>
+
+          <div class="power-toggle-wrap">
+            <span class="power-label">Master Power</span>
+            <label class="switch">
+              <input type="checkbox" id="switch-master" checked>
+              <span class="slider-round"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Interactive Virtual Room Visualizer -->
+        <div class="room-box">
+          <canvas id="room-canvas"></canvas>
+        </div>
+
+        <!-- Master Brightness Intensity -->
+        <div class="glass-panel" style="padding: 12px 16px;">
+          <div class="bri-header">
+            <span>MASTER INTENSITY</span>
+            <span class="bri-val" id="lbl-master-bri">100%</span>
+          </div>
+          <input type="range" id="slider-master-bri" min="1" max="100" value="100">
+        </div>
+
+        <!-- Devices Cards Row -->
+        <div class="devices-row">
+          <!-- Strip Card -->
+          <div class="device-card">
+            <div class="dev-header">
+              <div class="dev-info">
+                <h4>ELK-BLEDOB Strip</h4>
+                <p>BE:37:F1:00:CF:7E</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="switch-strip" checked>
+                <span class="slider-round"></span>
+              </label>
+            </div>
+            <div class="dev-controls">
+              <div class="bri-header">
+                <span>Brightness</span>
+                <span class="bri-val" id="lbl-strip-bri">100%</span>
+              </div>
+              <input type="range" id="slider-strip-bri" min="1" max="100" value="100">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+                <span style="font-size: 11px; color: #64748b;">Live Color</span>
+                <div id="swatch-strip" style="width: 28px; height: 16px; border-radius: 4px; background: #ff5500; border: 1px solid rgba(255,255,255,0.2);"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bulb Card -->
+          <div class="device-card">
+            <div class="dev-header">
+              <div class="dev-info">
+                <h4>KS04-651420 Bulb</h4>
+                <p>41:24:86:92:02:22</p>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="switch-bulb" checked>
+                <span class="slider-round"></span>
+              </label>
+            </div>
+            <div class="dev-controls">
+              <div class="bri-header">
+                <span>Brightness</span>
+                <span class="bri-val" id="lbl-bulb-bri">100%</span>
+              </div>
+              <input type="range" id="slider-bulb-bri" min="1" max="100" value="100">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+                <span style="font-size: 11px; color: #64748b;">Live Color</span>
+                <div id="swatch-bulb" style="width: 28px; height: 16px; border-radius: 4px; background: #00f0ff; border: 1px solid rgba(255,255,255,0.2);"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- RIGHT COLUMN: COLOR STUDIO, WHITE SPECTRUM & SCENES -->
+      <section class="col-right">
+
+        <!-- Color Studio Card -->
+        <div class="glass-panel">
+          <div class="panel-header">
+            <span class="panel-title">🎨 Color Gamut Studio</span>
+            <div class="hex-box">
+              <span style="font-size: 11px; color: #64748b; font-weight: 700;">HEX</span>
+              <input type="text" id="input-hex" value="#FF5500" maxlength="7">
+            </div>
+          </div>
+
+          <div class="studio-grid">
+            <!-- Circular HSV Color Wheel -->
+            <div class="wheel-container">
+              <canvas id="wheel-canvas"></canvas>
+            </div>
+
+            <!-- Kelvin White Spectrum -->
+            <div class="kelvin-card">
+              <div class="bri-header">
+                <span>KELVIN WHITE SPECTRUM</span>
+                <span class="bri-val" id="lbl-kelvin" style="color: #ffaa33;">4000K</span>
+              </div>
+              <input type="range" id="slider-kelvin" class="kelvin-slider" min="2000" max="6500" value="4000">
+
+              <div style="display: flex; justify-content: space-between; font-size: 10px; color: #64748b; margin-top: 2px;">
+                <span>2000K Candle</span>
+                <span>6500K Daylight</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Designer Scenes Card -->
+        <div class="glass-panel">
+          <div class="panel-header">
+            <span class="panel-title">🎭 Curated Designer Scenes</span>
+          </div>
+
+          <div class="scenes-grid">
+            <button class="scene-btn" data-r="255" data-g="90" data-b="20" data-bri="85">
+              <span class="scene-color-dot" style="background: #ff5a14; color: #ff5a14;"></span>
+              <span>Sunset Glow</span>
+            </button>
+            <button class="scene-btn" data-r="0" data-g="240" data-b="255" data-bri="95">
+              <span class="scene-color-dot" style="background: #00f0ff; color: #00f0ff;"></span>
+              <span>Cyberpunk Neon</span>
+            </button>
+            <button class="scene-btn" data-r="0" data-g="140" data-b="255" data-bri="80">
+              <span class="scene-color-dot" style="background: #008cff; color: #008cff;"></span>
+              <span>Deep Ocean</span>
+            </button>
+            <button class="scene-btn" data-r="255" data-g="147" data-b="41" data-bri="45">
+              <span class="scene-color-dot" style="background: #ff9329; color: #ff9329;"></span>
+              <span>Candlelight</span>
+            </button>
+            <button class="scene-btn" data-r="16" data-g="185" data-b="129" data-bri="75">
+              <span class="scene-color-dot" style="background: #10b981; color: #10b981;"></span>
+              <span>Emerald Forest</span>
+            </button>
+            <button class="scene-btn" data-r="168" data-g="85" data-b="247" data-bri="85">
+              <span class="scene-color-dot" style="background: #a855f7; color: #a855f7;"></span>
+              <span>Nordic Aurora</span>
+            </button>
+            <button class="scene-btn" data-r="255" data-g="255" data-b="255" data-bri="100">
+              <span class="scene-color-dot" style="background: #ffffff; color: #ffffff;"></span>
+              <span>Focus Daylight</span>
+            </button>
+            <button class="scene-btn" data-r="255" data-g="10" data-b="10" data-bri="40">
+              <span class="scene-color-dot" style="background: #ff0a0a; color: #ff0a0a;"></span>
+              <span>Stealth Red</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Dynamic Hardware Effects Card -->
+        <div class="glass-panel">
+          <div class="panel-header">
+            <span class="panel-title">✨ Dynamic Lighting Effects</span>
+          </div>
+
+          <div class="effects-row">
+            <button class="fx-btn" data-fx="1">🌈 Rainbow Flow</button>
+            <button class="fx-btn" data-fx="4">🕯️ Candle Flicker</button>
+            <button class="fx-btn" data-fx="2">⚡ Cyber Pulse</button>
+            <button class="fx-btn" data-fx="7">🌊 Ocean Swell</button>
+            <button class="fx-btn" data-fx="6">🎉 Disco Strobe</button>
+            <button class="fx-btn" data-fx="9">🔴 Police Flasher</button>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/audio.js"></script>
+  <script src="js/room_visualizer.js"></script>
+  <script src="js/color_wheel.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
+

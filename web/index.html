@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DualLumi PRO - Master LED Strip & KS04 Smart Bulb Controller</title>
+
+    <!-- SEO & Meta -->
+    <meta name="description" content="Ultra-modern BLE smart lighting controller for ELK-BLEDOB LED strip and KS04-651420 smart bulb with music sync, Ambilight, voice control, and automation.">
+    <meta name="keywords" content="LED controller, smart bulb, ELK-BLEDOB, KS04-651420, Bluetooth, Ambilight, music sync, voice control">
+
+    <!-- PWA Meta & Icons -->
+    <meta name="theme-color" content="#0E121B">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+
+    <!-- Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Ambient Dynamic Background Glows -->
+    <div class="ambient-glow glow-1" id="ambientGlow1"></div>
+    <div class="ambient-glow glow-2" id="ambientGlow2"></div>
+
+    <div class="app-container">
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- NATIVE DESKTOP TITLEBAR (Visible only when running Desktop App) -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <div class="desktop-titlebar" id="desktopTitlebar">
+            <div class="titlebar-drag-region">
+                <span class="titlebar-icon">⚡</span>
+                <span class="titlebar-title">DualLumi PRO Desktop</span>
+                <span class="titlebar-badge">v3.5</span>
+            </div>
+            <div class="titlebar-controls">
+                <button class="tb-btn" id="tbMiniHud" title="Floating Mini HUD (Ctrl+Shift+W)">🗗 Mini</button>
+                <button class="tb-btn" id="tbMinimize" title="Minimize to Tray">🗕</button>
+                <button class="tb-btn" id="tbMaximize" title="Maximize">🗖</button>
+                <button class="tb-btn close" id="tbClose" title="Minimize to System Tray">✕</button>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- TOP APP BAR -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <header class="app-header glass-card">
+            <div class="brand">
+                <div class="logo-icon" id="brandLogo">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="brand-title">DualLumi <span class="badge-pro">PRO v3.0</span></h1>
+                    <p class="brand-subtitle">Unified BLE Controller • ELK Strip & KS04 Bulb</p>
+                </div>
+            </div>
+
+            <!-- Real-time Hardware Quick Badges -->
+            <div class="hardware-pills">
+                <div class="hw-pill" id="pillBtRadio" title="Bluetooth Radio status (Click to toggle)">
+                    <span class="status-dot dot-warn" id="dotBtRadio"></span>
+                    <span id="textBtRadio">Bluetooth: Checking...</span>
+                </div>
+                <div class="hw-pill" id="pillStrip" title="ELK Strip status">
+                    <span class="status-dot dot-off" id="dotStrip"></span>
+                    <span id="textStrip">Strip: Offline</span>
+                </div>
+                <div class="hw-pill" id="pillBulb" title="KS04 Bulb status">
+                    <span class="status-dot dot-off" id="dotBulb"></span>
+                    <span id="textBulb">Bulb: Offline</span>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <div class="theme-select-wrap">
+                    <select id="themeSelector" class="theme-select" title="UI Theme" aria-label="Select theme">
+                        <option value="dark">🌌 Dark Glass</option>
+                        <option value="oled">🖤 OLED Black</option>
+                        <option value="cyberpunk">⚡ Cyberpunk Neon</option>
+                        <option value="sunset">🌅 Sunset Warm</option>
+                        <option value="aurora">🌌 Aurora Borealis</option>
+                    </select>
+                </div>
+                <button class="btn btn-secondary" id="btnToggleSound" title="Sound Effects" aria-label="Toggle sound">
+                    <span id="soundIcon">🔊</span>
+                </button>
+                <button class="btn btn-secondary" id="btnVoiceControl" title="Voice Commands (Darija, Arabic, English)" aria-label="Voice control">
+                    <span>🎙️ Voice</span>
+                </button>
+                <button class="btn btn-secondary" id="btnOpenSchedules" title="Smart Schedules & Sunrise Alarm" aria-label="Schedules">
+                    <span>⏰ Schedules</span>
+                </button>
+                <button class="btn btn-secondary" id="btnOpenEffects" title="Dynamic Lighting Effects" aria-label="Effects">
+                    <span>✨ Effects</span>
+                </button>
+                <button class="btn btn-secondary" id="openSettingsBtn" title="Settings & Diagnostics" aria-label="Settings">
+                    <span>⚙️</span>
+                </button>
+                <button class="btn btn-primary" id="openScanBtn" aria-label="Scan BLE devices">
+                    <span>📡 Scan BLE</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- MODE BAR & MASTER POWER -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <section class="mode-bar glass-card">
+            <div class="mode-switch-group">
+                <button class="mode-btn active" id="btnSyncMode" aria-label="Sync mode">
+                    <span>⚡ Unified Sync Mode (Both)</span>
+                </button>
+                <button class="mode-btn" id="btnIndepMode" aria-label="Independent mode">
+                    <span>🎛️ Independent Mode</span>
+                </button>
+            </div>
+
+            <div class="master-power-wrap">
+                <div class="power-status-indicator" id="masterPowerLed"></div>
+                <span class="power-label">Master Power</span>
+                <label class="switch" aria-label="Master power toggle">
+                    <input type="checkbox" id="masterPowerSwitch" checked>
+                    <span class="slider round"></span>
+                </label>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- DUAL DEVICE LIVE STATUS & CONTROLS -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <section class="device-cards-grid">
+            <!-- Strip Card -->
+            <div class="glass-card device-card" id="cardStrip">
+                <div class="device-card-header">
+                    <div class="device-identity">
+                        <div class="device-icon">🌈</div>
+                        <div>
+                            <h3 class="device-name" id="nameStrip">ELK-BLEDOB LED Strip</h3>
+                            <span class="device-mac" id="macStrip">BE:37:F1:00:CF:7E</span>
+                        </div>
+                    </div>
+                    <div class="device-header-right">
+                        <span class="device-badge badge-disconnected" id="badgeStrip">Disconnected</span>
+                        <label class="switch switch-sm" title="Strip Power">
+                            <input type="checkbox" id="powerStrip">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="device-body">
+                    <div class="device-row">
+                        <span class="row-label">Brightness</span>
+                        <span class="row-value" id="valBrightnessStrip">100%</span>
+                    </div>
+                    <input type="range" min="1" max="100" value="100" class="mini-slider" id="sliderBrightnessStrip">
+
+                    <div class="device-quick-footer">
+                        <div class="color-mini-preview" id="previewStrip" title="Current strip color"></div>
+                        <div class="calib-select-wrap">
+                            <label>Order:</label>
+                            <select id="calibStrip" class="select-micro" title="Color Calibration">
+                                <option value="RGB">RGB</option>
+                                <option value="GRB">GRB</option>
+                                <option value="BGR">BGR</option>
+                                <option value="BRG">BRG</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-secondary btn-sm" id="btnConnectStrip">Connect</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bulb Card -->
+            <div class="glass-card device-card" id="cardBulb">
+                <div class="device-card-header">
+                    <div class="device-identity">
+                        <div class="device-icon">💡</div>
+                        <div>
+                            <h3 class="device-name" id="nameBulb">KS04-651420 Smart Bulb</h3>
+                            <span class="device-mac" id="macBulb">41:24:86:92:02:22</span>
+                        </div>
+                    </div>
+                    <div class="device-header-right">
+                        <span class="device-badge badge-disconnected" id="badgeBulb">Disconnected</span>
+                        <label class="switch switch-sm" title="Bulb Power">
+                            <input type="checkbox" id="powerBulb">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="device-body">
+                    <div class="device-row">
+                        <span class="row-label">Brightness</span>
+                        <span class="row-value" id="valBrightnessBulb">100%</span>
+                    </div>
+                    <input type="range" min="1" max="100" value="100" class="mini-slider" id="sliderBrightnessBulb">
+
+                    <div class="device-quick-footer">
+                        <div class="color-mini-preview" id="previewBulb" title="Current bulb color"></div>
+                        <div class="calib-select-wrap">
+                            <label>Order:</label>
+                            <select id="calibBulb" class="select-micro" title="Color Calibration">
+                                <option value="RGB">RGB</option>
+                                <option value="GRB">GRB</option>
+                                <option value="BGR">BGR</option>
+                                <option value="BRG">BRG</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-secondary btn-sm" id="btnConnectBulb">Connect</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- MASTER BRIGHTNESS & COLOR TEMPERATURE HERO SECTION -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <section class="glass-card hero-brightness-card">
+            <!-- Master Brightness -->
+            <div class="hero-brightness-header">
+                <div class="hero-b-title">
+                    <span class="sun-icon">☀️</span>
+                    <div>
+                        <h2>MASTER INTENSITY CONTROL</h2>
+                        <p>Zero-latency hardware packet coalescing</p>
+                    </div>
+                </div>
+                <div class="brightness-badge" id="valHeroBrightness" aria-live="polite">100%</div>
+            </div>
+
+            <div class="hero-slider-wrap">
+                <input type="range" min="1" max="100" value="100" class="hero-range" id="heroBrightnessSlider" aria-label="Master brightness">
+            </div>
+
+            <div class="brightness-presets">
+                <button class="b-preset-chip" data-b="10">10% Night</button>
+                <button class="b-preset-chip" data-b="25">25% Dim</button>
+                <button class="b-preset-chip" data-b="50">50% Medium</button>
+                <button class="b-preset-chip" data-b="75">75% High</button>
+                <button class="b-preset-chip active" data-b="100">100% Max</button>
+            </div>
+
+            <div class="divider-line"></div>
+
+            <!-- Color Temperature (Kelvin Spectrum) -->
+            <div class="kelvin-section">
+                <div class="kelvin-header">
+                    <div class="kelvin-title">
+                        <span class="kelvin-icon">🌡️</span>
+                        <div>
+                            <h3>WHITE SPECTRUM TEMPERATURE</h3>
+                            <p>Warm Candle (2000K) to Crisp Daylight (6500K)</p>
+                        </div>
+                    </div>
+                    <div class="kelvin-badge" id="valKelvin">4000K</div>
+                </div>
+
+                <div class="kelvin-slider-wrap">
+                    <input type="range" min="2000" max="6500" value="4000" step="50" class="kelvin-range" id="kelvinSlider" aria-label="Color temperature">
+                </div>
+
+                <div class="kelvin-presets">
+                    <button class="k-preset-chip" data-k="2000">🕯️ Candle (2000K)</button>
+                    <button class="k-preset-chip" data-k="2700">🌅 Warm White (2700K)</button>
+                    <button class="k-preset-chip" data-k="4000">💡 Neutral (4000K)</button>
+                    <button class="k-preset-chip" data-k="5500">☀️ Daylight (5500K)</button>
+                    <button class="k-preset-chip" data-k="6500">❄️ Cool Sky (6500K)</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- INTERACTIVE COLOR STUDIO & PALETTES -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <section class="glass-card color-section">
+            <div class="section-header-split">
+                <div>
+                    <h3>🎨 Interactive Color Studio</h3>
+                    <p>HSV circular gamut picker with instant hardware synchronization</p>
+                </div>
+                <!-- Target switch when in Independent Mode -->
+                <div class="target-selector-wrap" id="colorTargetWrap">
+                    <span class="target-label">Target:</span>
+                    <div class="target-pills">
+                        <button class="target-pill active" id="targetAll">Both Lights</button>
+                        <button class="target-pill" id="targetStrip">Strip Only</button>
+                        <button class="target-pill" id="targetBulb">Bulb Only</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="color-tools-row">
+                <!-- Color Wheel Canvas -->
+                <div class="color-wheel-wrapper">
+                    <div class="color-wheel-container">
+                        <canvas id="colorWheelCanvas" width="300" height="300"></canvas>
+                        <div class="wheel-center-dot" id="wheelCenterDot"></div>
+                    </div>
+                </div>
+
+                <!-- Color Controls & Actions -->
+                <div class="color-controls">
+                    <div class="color-preview-box">
+                        <div class="color-preview" id="currentColorPreview"></div>
+                        <div class="hex-wrap">
+                            <input type="text" id="hexColorInput" class="hex-input" value="#FF5500" maxlength="7" spellcheck="false">
+                            <button class="btn btn-secondary btn-icon" id="btnEyeDropper" title="Sample color from screen">
+                                <span>💧 EyeDropper</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Quick Vibrant Colors -->
+                    <div class="quick-colors-wrap">
+                        <label>Vibrant Presets</label>
+                        <div class="quick-colors-grid" id="quickColorsGrid"></div>
+                    </div>
+
+                    <!-- Recent Color History -->
+                    <div class="color-history-section">
+                        <label>Recent Colors</label>
+                        <div class="color-history-swatches" id="colorHistorySwatches"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- CURATED COLOR PALETTES -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <section class="glass-card section-card">
+            <div class="section-header">
+                <h3>🎭 Designer Color Palettes</h3>
+                <p>One-click mood illumination professionally calibrated for dual lighting</p>
+            </div>
+            <div class="palettes-grid" id="palettesGrid"></div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- PHOTO COLOR EXTRACTION STUDIO -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <section class="glass-card section-card">
+            <div class="section-header">
+                <h3>📸 Photo Color Extraction</h3>
+                <p>Drop any photo, movie poster, or wallpaper to extract and project its color scheme</p>
+            </div>
+            <div class="photo-drop-zone" id="photoDropZone">
+                <input type="file" id="photoInput" accept="image/*" hidden>
+                <div class="drop-prompt" id="dropPrompt">
+                    <span class="drop-icon">🖼️</span>
+                    <span>Drag & drop an image here or click to browse</span>
+                    <small>Extracts vivid dominant tones via Canvas Color Analysis</small>
+                </div>
+                <div class="photo-preview-wrap" id="photoPreviewWrap" style="display:none;">
+                    <img id="photoThumb" class="photo-thumb" alt="Preview">
+                    <button class="btn btn-secondary btn-sm" id="btnRemovePhoto">Remove Image</button>
+                </div>
+                <div class="extracted-swatches" id="extractedSwatches"></div>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- REAL-TIME ENTERTAINMENT: MUSIC REACTIVE & AMBILIGHT -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <section class="glass-card section-card">
+            <div class="section-header">
+                <h3>🎵 Entertainment Reactive Modes</h3>
+                <p>High-fidelity audio spectrum beat-sync & real-time Ambilight display mirroring</p>
+            </div>
+
+            <div class="entertainment-grid">
+                <!-- Music Card -->
+                <div class="ent-panel" id="panelMusic">
+                    <div class="ent-header">
+                        <div class="ent-title">
+                            <span class="ent-icon">🎙️</span>
+                            <div>
+                                <h4>Music Reactive Beat-Sync</h4>
+                                <span class="ent-status" id="statusMusic">Status: Inactive</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary btn-sm" id="btnToggleMusic">Start Music Sync</button>
+                    </div>
+
+                    <!-- 16-Band Live Visualizer Canvas -->
+                    <div class="visualizer-container">
+                        <canvas id="musicVisualizer" width="450" height="90"></canvas>
+                    </div>
+
+                    <div class="music-controls-row">
+                        <div class="music-mode-chips">
+                            <button class="m-chip active" data-mode="harmonic">Harmonic Flow</button>
+                            <button class="m-chip" data-mode="beat">Beat Pulse</button>
+                            <button class="m-chip" data-mode="spectrum">RGB Spectrum</button>
+                            <button class="m-chip" data-mode="strobe">Intensity Strobe</button>
+                        </div>
+                        <div class="sensitivity-wrap">
+                            <label>Sensitivity: <span id="valSensitivity">75%</span></label>
+                            <input type="range" min="10" max="150" value="75" id="sliderSensitivity" class="mini-slider">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Screen Sync Card -->
+                <div class="ent-panel" id="panelScreenSync">
+                    <div class="ent-header">
+                        <div class="ent-title">
+                            <span class="ent-icon">🖥️</span>
+                            <div>
+                                <h4>Ambilight Screen Sync</h4>
+                                <span class="ent-status" id="statusScreenSync">Status: Inactive</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary btn-sm" id="btnToggleScreenSync">Start Screen Sync</button>
+                    </div>
+
+                    <div class="screen-preview-container">
+                        <canvas id="screenPreviewCanvas" width="240" height="135"></canvas>
+                        <div class="screen-glow-preview" id="screenGlowPreview"></div>
+                    </div>
+
+                    <div class="screen-controls-row">
+                        <label class="radio-label"><input type="radio" name="screenSample" value="edge" checked> Edge Sampling</label>
+                        <label class="radio-label"><input type="radio" name="screenSample" value="full"> Full Screen Average</label>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- CIRCADIAN RHYTHM MODE -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <section class="glass-card section-card">
+            <div class="section-header">
+                <h3>🕒 Circadian Natural Daylight Alignment</h3>
+                <p>Synchronizes color temperature with astronomical sunlight cycles to optimize melatonin & focus</p>
+            </div>
+            <div class="circadian-control-row">
+                <div class="circadian-info">
+                    <span class="circadian-badge" id="circadianStatus">Status: Inactive</span>
+                    <p class="circadian-desc" id="circadianDesc">
+                        🌅 06:00-09:00 Warm Wakeup • ☀️ 09:00-17:00 Cool Daylight • 🌇 17:00-21:00 Relaxing Amber • 🌙 21:00-06:00 Deep Candle
+                    </p>
+                </div>
+                <label class="switch" title="Toggle Circadian Rhythm">
+                    <input type="checkbox" id="circadianSwitch">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+        </section>
+
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <!-- PRESET & CUSTOM SCENES -->
+        <!-- ═══════════════════════════════════════════════════════════════ -->
+        <section class="glass-card section-card">
+            <div class="section-header-split">
+                <div>
+                    <h3>🎬 Lighting Scenes</h3>
+                    <p>Curated atmosphere presets and saved custom ambiances</p>
+                </div>
+                <button class="btn btn-primary btn-sm" id="btnSaveCustomScene">💾 Save Current Scene</button>
+            </div>
+
+            <div class="scenes-section-title">Built-In Presets</div>
+            <div class="scenes-grid" id="presetScenesGrid"></div>
+
+            <div class="scenes-section-title" style="margin-top:20px;">My Custom Scenes</div>
+            <div class="scenes-grid" id="customScenesGrid">
+                <div class="empty-scenes-prompt" id="emptyScenesPrompt">No custom scenes saved yet. Click "+ Save Current Scene" above!</div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- MODAL: DYNAMIC EFFECTS STUDIO -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="modal" id="effectsModal">
+        <div class="modal-content glass-card modal-lg">
+            <div class="modal-header">
+                <h3>✨ Dynamic Lighting Effects Studio</h3>
+                <button class="close-modal" id="closeEffectsBtn" aria-label="Close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="effects-speed-bar">
+                    <label>Effect Speed: <span id="valEffectSpeed">50%</span></label>
+                    <input type="range" min="1" max="100" value="50" id="sliderEffectSpeed" class="hero-range">
+                </div>
+
+                <div class="effects-grid" id="effectsGrid"></div>
+
+                <div class="modal-footer-actions">
+                    <button class="btn btn-secondary" id="btnStopEffects">⏹️ Stop Dynamic Effects</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- MODAL: SMART SCHEDULING SYSTEM -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="modal" id="schedulesModal">
+        <div class="modal-content glass-card modal-lg">
+            <div class="modal-header">
+                <h3>⏰ Smart Schedules & Sunrise Alarms</h3>
+                <button class="close-modal" id="closeSchedulesBtn" aria-label="Close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Add New Schedule Form -->
+                <div class="schedule-form glass-card">
+                    <h4>Add Automation Schedule</h4>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Trigger Time (24h)</label>
+                            <input type="time" id="newScheduleTime" class="input-text" value="07:30">
+                        </div>
+                        <div class="form-group">
+                            <label>Action</label>
+                            <select id="newScheduleAction" class="input-text">
+                                <option value="sunrise">🌅 Gentle Sunrise Alarm (Warm 100%)</option>
+                                <option value="power_on">💡 Power ON</option>
+                                <option value="sunset">🌇 Sunset Glow (Relaxing Amber)</option>
+                                <option value="power_off">🌙 Power OFF (Sleep)</option>
+                            </select>
+                        </div>
+                        <div class="form-group flex-end">
+                            <button class="btn btn-primary" id="btnAddSchedule">+ Add Schedule</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Schedules List -->
+                <h4 style="margin-top:20px;">Active Schedules</h4>
+                <div class="schedules-list" id="schedulesList">
+                    <p class="text-secondary">No automated schedules currently set.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- MODAL: BLUETOOTH BLE SCANNER -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="modal" id="scanModal">
+        <div class="modal-content glass-card modal-lg">
+            <div class="modal-header">
+                <h3>📡 Bluetooth LE Device Scanner</h3>
+                <button class="close-modal" id="closeScanBtn" aria-label="Close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="scan-action-row">
+                    <button class="btn btn-primary" id="btnStartScan">🔍 Scan Nearby BLE Devices</button>
+                    <span class="scan-status" id="scanStatusText">Click Scan to search for LED strips and Smart Bulbs</span>
+                </div>
+
+                <div class="scan-results-container" id="scanResultsContainer">
+                    <div class="empty-scan-state">
+                        <span style="font-size:36px;">📡</span>
+                        <p>No scan performed yet. Make sure your PC Bluetooth is ON and your vendor phone apps (LotusLamp / Dazzling home) are closed.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- MODAL: VOICE COMMAND GUIDE & LISTENER -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="modal" id="voiceModal">
+        <div class="modal-content glass-card">
+            <div class="modal-header">
+                <h3>🎙️ Voice Control Studio</h3>
+                <button class="close-modal" id="closeVoiceBtn" aria-label="Close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="voice-listening-box" id="voiceListeningBox">
+                    <div class="voice-wave" id="voiceWave">
+                        <span></span><span></span><span></span><span></span><span></span>
+                    </div>
+                    <div class="voice-live-text" id="voiceTranscript">Click microphone button to speak...</div>
+                </div>
+
+                <div class="voice-guide-sections">
+                    <div class="guide-lang">
+                        <h4>🇲🇦 Darija (الدارجة المغربية)</h4>
+                        <ul>
+                            <li><strong>"شعل الضو"</strong> / <strong>"شعل"</strong> - تشغيل الأضواء</li>
+                            <li><strong>"طفي الضو"</strong> / <strong>"طفي"</strong> - إطفاء الأضواء</li>
+                            <li><strong>"حمر"</strong> / <strong>"دير لحمر"</strong> - لون أحمر</li>
+                            <li><strong>"زرق"</strong> / <strong>"دير لزرق"</strong> - لون أزرق</li>
+                            <li><strong>"خضر"</strong> / <strong>"دير لخضر"</strong> - لون أخضر</li>
+                            <li><strong>"زيد فالضو"</strong> - رفع السطوع</li>
+                            <li><strong>"نقص فالضو"</strong> - خفض السطوع</li>
+                        </ul>
+                    </div>
+                    <div class="guide-lang">
+                        <h4>🇬🇧 English Commands</h4>
+                        <ul>
+                            <li><strong>"Turn on"</strong> / <strong>"Lights on"</strong></li>
+                            <li><strong>"Turn off"</strong> / <strong>"Lights off"</strong></li>
+                            <li><strong>"Red"</strong>, <strong>"Blue"</strong>, <strong>"Green"</strong>, <strong>"Purple"</strong>, <strong>"White"</strong></li>
+                            <li><strong>"Brighter"</strong>, <strong>"Dimmer"</strong>, <strong>"Max brightness"</strong></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary btn-block" id="btnStartVoiceModal">🎙️ Start Listening</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <!-- MODAL: SETTINGS & DIAGNOSTICS -->
+    <!-- ═══════════════════════════════════════════════════════════════ -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content glass-card modal-lg">
+            <div class="modal-header">
+                <h3>⚙️ Settings & System Diagnostics</h3>
+                <button class="close-modal" id="closeSettingsBtn" aria-label="Close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Bluetooth Hardware Section -->
+                <div class="settings-group">
+                    <h4>📶 Windows Bluetooth Radio</h4>
+                    <div class="settings-row">
+                        <div>
+                            <strong>Bluetooth Adapter Radio</strong>
+                            <p class="text-secondary" id="btRadioStatusDesc">Checking status...</p>
+                        </div>
+                        <button class="btn btn-secondary" id="btnToggleBtRadio">Turn Bluetooth ON</button>
+                    </div>
+                </div>
+
+                <!-- API Key Security Section -->
+                <div class="settings-group">
+                    <h4>🔐 Security & API Key</h4>
+                    <div class="form-group">
+                        <label for="apiKeyInput">Server API Key</label>
+                        <input type="text" id="apiKeyInput" class="input-text" placeholder="Enter API Key">
+                        <small>Auto-configured for localhost. Enter key if controlling across LAN.</small>
+                    </div>
+                    <button class="btn btn-primary" id="saveApiKeyBtn">Save API Key</button>
+                </div>
+
+                <!-- Connection Diagnostics -->
+                <div class="settings-group">
+                    <h4>🔌 Live Diagnostics</h4>
+                    <div class="diag-grid">
+                        <div class="diag-item">
+                            <span>Backend Server:</span>
+                            <strong id="diagServerStatus" class="text-success">Connected</strong>
+                        </div>
+                        <div class="diag-item">
+                            <span>WebSocket Ping:</span>
+                            <strong id="diagPing">-- ms</strong>
+                        </div>
+                        <div class="diag-item">
+                            <span>ELK Strip MAC:</span>
+                            <code id="diagStripMac">BE:37:F1:00:CF:7E</code>
+                        </div>
+                        <div class="diag-item">
+                            <span>KS04 Bulb MAC:</span>
+                            <code id="diagBulbMac">41:24:86:92:02:22</code>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="web_bluetooth.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

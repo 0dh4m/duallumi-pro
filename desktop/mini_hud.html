@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DualLumi Mini HUD</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      user-select: none;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+    body {
+      background: transparent;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .hud-card {
+      width: 290px;
+      height: 130px;
+      background: rgba(15, 20, 30, 0.88);
+      border: 1px solid rgba(0, 240, 255, 0.35);
+      border-radius: 14px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(0, 240, 255, 0.2);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 10px 14px;
+      color: #ffffff;
+      -webkit-app-region: drag;
+    }
+    .hud-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .hud-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: #00f0ff;
+    }
+    .hud-actions {
+      display: flex;
+      gap: 6px;
+      -webkit-app-region: no-drag;
+    }
+    .hud-icon-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      transition: all 0.2s;
+    }
+    .hud-icon-btn:hover {
+      background: rgba(0, 240, 255, 0.3);
+      border-color: #00f0ff;
+    }
+    .hud-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      -webkit-app-region: no-drag;
+    }
+    .power-btn {
+      background: linear-gradient(135deg, #00f0ff, #0088ff);
+      border: none;
+      color: #000;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+      transition: all 0.2s;
+    }
+    .power-btn.off {
+      background: rgba(255, 255, 255, 0.15);
+      color: #888;
+      box-shadow: none;
+    }
+    .slider-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: #8899aa;
+    }
+    .slider-header span:last-child {
+      color: #00f0ff;
+      font-weight: 700;
+    }
+    input[type=range] {
+      width: 100%;
+      height: 5px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.2);
+      outline: none;
+      -webkit-appearance: none;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: #00f0ff;
+      cursor: pointer;
+      box-shadow: 0 0 6px #00f0ff;
+    }
+    .hud-scenes {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      -webkit-app-region: no-drag;
+    }
+    .scene-dot {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      transition: all 0.2s;
+    }
+    .scene-dot:hover {
+      transform: scale(1.2);
+      box-shadow: 0 0 10px currentColor;
+    }
+  </style>
+</head>
+<body>
+  <div class="hud-card">
+    <div class="hud-header">
+      <div class="hud-brand">
+        <span>⚡ DualLumi HUD</span>
+      </div>
+      <div class="hud-actions">
+        <button class="hud-icon-btn" id="btnExpand" title="Expand Full Dashboard">🗖</button>
+        <button class="hud-icon-btn" id="btnCloseHud" title="Hide HUD">✕</button>
+      </div>
+    </div>
+
+    <div class="hud-controls">
+      <button class="power-btn" id="btnPower" title="Toggle Master Power">⏻</button>
+      <div class="slider-wrap">
+        <div class="slider-header">
+          <span>BRIGHTNESS</span>
+          <span id="txtBri">100%</span>
+        </div>
+        <input type="range" id="rngBri" min="5" max="100" value="100">
+      </div>
+    </div>
+
+    <div class="hud-scenes">
+      <div class="scene-dot" style="background: #ff5500; color: #ff5500;" data-scene="sunset" title="Sunset"></div>
+      <div class="scene-dot" style="background: #00f0ff; color: #00f0ff;" data-scene="cyberpunk" title="Cyberpunk"></div>
+      <div class="scene-dot" style="background: #0088ff; color: #0088ff;" data-scene="ocean" title="Ocean"></div>
+      <div class="scene-dot" style="background: #ffaa33; color: #ffaa33;" data-scene="candle" title="Candlelight"></div>
+      <div class="scene-dot" style="background: #ffffff; color: #ffffff;" data-scene="daylight" title="Daylight"></div>
+      <div class="scene-dot" style="background: #ff2222; color: #ff2222;" data-scene="red_stealth" title="Red Stealth"></div>
+    </div>
+  </div>
+
+  <script>
+    const { ipcRenderer } = require('electron');
+
+    const btnPower = document.getElementById('btnPower');
+    const rngBri = document.getElementById('rngBri');
+    const txtBri = document.getElementById('txtBri');
+
+    let isPowerOn = true;
+
+    // Toggle Power
+    btnPower.addEventListener('click', async () => {
+      isPowerOn = !isPowerOn;
+      updatePowerUI(isPowerOn);
+      ipcRenderer.send('mini-action', { action: 'power', state: isPowerOn });
+    });
+
+    // Slider Brightness
+    rngBri.addEventListener('input', (e) => {
+      const val = e.target.value;
+      txtBri.textContent = `${val}%`;
+      ipcRenderer.send('mini-action', { action: 'brightness', value: val });
+    });
+
+    // Scene dots
+    document.querySelectorAll('.scene-dot').forEach(dot => {
+      dot.addEventListener('click', () => {
+        const scn = dot.getAttribute('data-scene');
+        ipcRenderer.send('mini-action', { action: 'scene', scene: scn });
+      });
+    });
+
+    // Expand
+    document.getElementById('btnExpand').addEventListener('click', () => {
+      ipcRenderer.send('mini-action', { action: 'expand' });
+    });
+
+    // Close HUD
+    document.getElementById('btnCloseHud').addEventListener('click', () => {
+      ipcRenderer.send('mini-action', { action: 'hide' });
+    });
+
+    function updatePowerUI(on) {
+      if (on) {
+        btnPower.classList.remove('off');
+      } else {
+        btnPower.classList.add('off');
+      }
+    }
+
+    // Listen for state sync from main
+    ipcRenderer.on('sync-state', (event, state) => {
+      if (state) {
+        isPowerOn = (state.strip?.power || state.bulb?.power);
+        updatePowerUI(isPowerOn);
+        if (state.strip?.brightness) {
+          rngBri.value = state.strip.brightness;
+          txtBri.textContent = `${state.strip.brightness}%`;
+        }
+      }
+    });
+  </script>
+</body>
+</html>
+

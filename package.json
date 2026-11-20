@@ -1,0 +1,22 @@
+{
+  "name": "duallumi-pro-desktop",
+  "version": "3.5.0",
+  "description": "DualLumi PRO - Advanced Desktop Lighting Controller & Ambilight Engine",
+  "main": "desktop/main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev"
+  },
+  "keywords": [
+    "led",
+    "smart-bulb",
+    "bluetooth",
+    "desktop",
+    "ambilight",
+    "glassmorphism",
+    "tray"
+  ],
+  "author": "Adam",
+  "license": "MIT"
+}
+
