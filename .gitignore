@@ -25,3 +25,9 @@ $RECYCLE.BIN/
 
 # Ignore device-specific configs
 backend/config.json
+
+# Electron runtime cache and temporary files
+desktop/window_state.json
+*.vbs
+*.tmp
+*.log
