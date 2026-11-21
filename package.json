@@ -16,7 +16,10 @@
     "glassmorphism",
     "tray"
   ],
-  "author": "Adam",
-  "license": "MIT"
+  "author": "Adham Cherkaoui Eddeqaqi <0dh4mm@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/0dh4m/duallumi-pro.git"
+  }
 }
-

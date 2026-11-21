@@ -73,7 +73,7 @@ Start_Silent_Background.bat
 ### 2. Interactive Menu
 Double-click:
 ```text
-Start_Controller.bat
+scripts/start.bat
 ```
 Offers:
 1. Run in Background
@@ -84,13 +84,13 @@ Offers:
 ### 3. Stop Server
 Double-click:
 ```text
-Stop_DualLumi.bat
+scripts/stop.bat
 ```
 
 ### 4. Auto-Start on Windows Boot
 Run as administrator:
 ```text
-Install_AutoStart_On_Boot.bat
+scripts/install_autostart.bat
 ```
 To uninstall startup:
 ```text
@@ -130,13 +130,13 @@ DualLumiControl/
 │   ├── web_bluetooth.js         # Direct Web Bluetooth fallback driver
 │   ├── manifest.json            # PWA manifest
 │   └── icons/                   # App icons (192, 512, SVG)
-├── Install_AutoStart_On_Boot.bat
+├── scripts/install_autostart.bat
 ├── Open_Web_Bluetooth_App.bat
 ├── Scan_Devices.bat
-├── Start_Controller.bat
-├── Start_DualLumi_Background.vbs
+├── scripts/start.bat
+├── scripts/start_silent.vbs
 ├── Start_Silent_Background.bat
-├── Stop_DualLumi.bat
+├── scripts/stop.bat
 └── Uninstall_AutoStart.bat
 ```
 
